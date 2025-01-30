@@ -1,4 +1,4 @@
-### Docker
+# Docker
 
 ## build docker image
 commented docker image: docker build --rm -t rest-api-demo:alpha .
