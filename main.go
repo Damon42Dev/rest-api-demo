@@ -1,50 +1,28 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"html"
+	"log"
 	"net/http"
-
-	"example/rest-api-demo/db"
-	"example/rest-api-demo/models"
-
-	"github.com/gin-gonic/gin"
+	"time"
 )
 
+type Time struct {
+	CurrentTime string `json:"current_time"`
+}
+
 func main() {
-	db.InitDB()
-	server := gin.Default()
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+	})
 
-	server.GET("/events", getEvents)
-	server.POST("/events", createEvent)
+	http.HandleFunc("/time", func(w http.ResponseWriter, r *http.Request) {
+		t := Time{CurrentTime: time.Now().String()}
+		json.NewEncoder(w).Encode(t)
+	})
 
-	server.Run(":8080") // localhost:8080
-}
-
-func getEvents(context *gin.Context) {
-	events, err := models.GetAllEvents()
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch events"})
-		return
-	}
-
-	context.JSON(http.StatusOK, events)
-}
-
-func createEvent(context *gin.Context) {
-	var event models.Event
-	err := context.ShouldBindJSON(&event)
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse request"})
-	}
-
-	event.ID = 1
-	event.UserID = 1
-
-	event.Save()
-
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not save event"})
-		return
-	}
-
-	context.JSON(http.StatusCreated, gin.H{"message": "Event created", "event": event})
+	fmt.Println("Server is running on port 8081")
+	log.Fatal(http.ListenAndServe(":8081", nil))
 }
