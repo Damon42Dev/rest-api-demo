@@ -4,8 +4,8 @@ Your task is to create a JSON REST API in Golang to handle CRUD operations with 
 
 Requirement
 
-- All the project should be containerized with Docker.
-- MongoDB should be seeded. For seeding, you can use [this open dataset](https://github.com/neelabalan/mongodb-sample-dataset/tree/main/sample_mflix)
+- All the project should be containerized with Docker. -> ✔️
+- MongoDB should be seeded. For seeding, you can use [this open dataset](https://github.com/neelabalan/mongodb-sample-dataset/tree/main/sample_mflix) -> ✔️
 - The CRUD operations on the dataset will involve
     - Getting movies and comments
     - Creating, Updating and Deleting comments
