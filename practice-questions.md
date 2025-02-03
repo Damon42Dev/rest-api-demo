@@ -15,3 +15,9 @@ Requirement
 - Write tests for the CRUD endpoints.
 
 Happy coding :)
+
+1. Create docker-compose
+2. Make local mongo db
+3. redis cache -> Optional
+4. anyone can run this prioject with READ ME
+5. put env filter -> clean project archetecture -> buttons/delivery/rest/handler.go
