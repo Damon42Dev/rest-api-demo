@@ -1,14 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"html"
 	"log"
 	"net/http"
 	"os"
-
-	"context"
+	"time"
 
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
@@ -24,20 +23,19 @@ type Time struct {
 func main() {
 	db := Connect()
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
+	http.HandleFunc("/time", func(w http.ResponseWriter, r *http.Request) {
+		t := Time{CurrentTime: time.Now().String()}
+		json.NewEncoder(w).Encode(t)
 	})
 
-	// http.HandleFunc("/time", func(w http.ResponseWriter, r *http.Request) {
-	// 	t := Time{CurrentTime: time.Now().String()}
-	// 	json.NewEncoder(w).Encode(t)
-	// })
+	fmt.Println("Connected to /time")
 
-	http.HandleFunc("/collection/users", func(w http.ResponseWriter, r *http.Request) {
-		collection := db.Collection("users")
+	http.HandleFunc("/movies", func(w http.ResponseWriter, r *http.Request) {
+		collection := db.Collection("movies")
 
 		cursor, err := collection.Find(context.Background(), bson.D{{}})
 		if err != nil {
+			log.Printf("Error finding documents: %s", err)
 			http.Error(w, fmt.Sprintf("Error finding documents: %s", err), http.StatusInternalServerError)
 			return
 		}
@@ -45,15 +43,22 @@ func main() {
 
 		var documents []bson.M
 		if err := cursor.All(context.Background(), &documents); err != nil {
+			log.Printf("Error decoding documents: %s", err)
 			http.Error(w, fmt.Sprintf("Error decoding documents: %s", err), http.StatusInternalServerError)
 			return
+		}
+
+		// Print documents to the console
+		for _, doc := range documents {
+			fmt.Println(doc)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(documents)
 	})
 
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	log.Println("Server is running on port 8080")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func Connect() *mongo.Database {
