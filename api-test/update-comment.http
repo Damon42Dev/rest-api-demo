@@ -1,0 +1,7 @@
+PUT http://localhost:8080/comments/5a9427648b0beebeb69579cc
+Content-Type: application/json
+
+{
+  "text": "This is a new comment",
+  "name": "This is a new name"
+}

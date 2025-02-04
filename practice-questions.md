@@ -16,8 +16,18 @@ Requirement
 
 Happy coding :)
 
-1. Create docker-compose
-2. Make local mongo db
-3. redis cache -> Optional
-4. anyone can run this prioject with READ ME
-5. put env filter -> clean project archetecture -> buttons/delivery/rest/handler.go
+TODOs: 
+1. redis cache -> Optional
+2. anyone can run this prioject with READ ME
+3. put env filter -> clean project archetecture -> buttons/delivery/rest/handler.go
+
+API Planning:
+
+GET /movies     -> with pagination in a limit of 10
+GET /movies/<id>
+GET /comments   -> with pagination in a limit of 10
+GET /comments/<id>
+
+POST /comments
+PUT  /comments/<id>
+DELETE /comments/<id>
