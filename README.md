@@ -1,3 +1,7 @@
+#How to run the project
+1. to use the actual credentials for .env file (!! Do NOT push it to remote repo)
+2. run "docker-compose up --build" in terminal
+
 # Docker
 
 ### build docker image
@@ -16,15 +20,12 @@ docker image ls
 ### to see the running docker info
 docker ps
 
-# Notes
-* Docker image needs to be rebuilt once any change is made. 
-
 ## Portals
+
 ### portal of running project locally:
 http://localhost:8081
 ### portal of running project in docker container:
 http://localhost:8080
-
 
 ### check host machine ip address
 ifconfig | grep inet
