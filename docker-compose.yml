@@ -22,5 +22,16 @@ services:
     volumes:
       - mongo-data:/data/db
 
+  mongo-seed:
+    build: 
+      context: ./mongo-seed
+      dockerfile: Dockerfile
+    container_name: mongo-seed
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    depends_on:
+      - mongodb
+  
 volumes:
   mongo-data:

@@ -28,3 +28,7 @@ http://localhost:8080
 
 ### check host machine ip address
 ifconfig | grep inet
+
+#MongoDB
+##Compass URI link to check the seeded db
+mongodb://damonwang:FkdyUuzr6ZqiYnE9@localhost:27017/admin 
