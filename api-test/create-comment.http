@@ -1,0 +1,10 @@
+POST http://localhost:8080/comments
+Content-Type: application/json
+
+{
+  "date": "2025-02-04T23:39:16Z",
+  "email": "damontest@demo.com",
+  "movie_id": "573a1390f29313caabcd418c",
+  "name": "Andrea Le",
+  "text": "This is a test comment for create comment api call"
+}
