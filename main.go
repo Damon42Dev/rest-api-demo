@@ -1,99 +1,40 @@
 package main
 
 import (
-	"context"
-	"fmt"
+	"example/rest-api-demo/config"
+	"example/rest-api-demo/routes"
 	"log"
-	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-var db *mongo.Database
+// var db *mongo.Database
 
 func main() {
-	db = Connect()
+	config.LoadEnv()
+	config.ConnectDB()
 
-	server := gin.Default()
-	server.GET("/movies", GetMovies)
-	server.GET("/comments", GetComments)
-	server.GET("/comments/:id", GetCommentByID)
-	server.POST("/comments", CreateComment)
-	server.PUT("/comments/:id", UpdateCommentByID)
-	server.DELETE("/comments/:id", DeleteCommentByID)
+	router := gin.Default()
 
-	server.GET("/movies/:id", GetMovieByID)
-	server.Run(":8080")
+	// Register API routes
+	routes.RegisterRoutes(router)
+
+	// Get port from environment or use default 8080
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	// Start the server
+	log.Printf("Server running on port %s\n", port)
+	err := router.Run(":" + port)
+	if err != nil {
+		log.Fatal("Failed to start server:", err)
+	}
 }
 
-func Connect() *mongo.Database {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file: %s", err)
-	}
-
-	MONGODB_URI := os.Getenv("MONGODB_URI")
-
-	clientOptions := options.Client().ApplyURI(MONGODB_URI)
-	client, err := mongo.Connect(context.Background(), clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = client.Ping(context.TODO(), readpref.Primary())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Println("Connected to MongoDB!")
-	return client.Database("sample_mflix")
-}
-
-func GetMovies(c *gin.Context) {
-	pageStr := c.Query("page")
-	sizeStr := c.Query("size")
-	page, err := strconv.Atoi(pageStr)
-	size, err := strconv.Atoi(sizeStr)
-	if err != nil || page < 1 {
-		page = 1
-	}
-
-	if err != nil || size < 1 {
-		size = 10
-	}
-
-	limit := int64(10)
-	skip := int64((page - 1) * 10)
-
-	collection := db.Collection("movies")
-	findOptions := options.Find()
-	findOptions.SetLimit(limit)
-	findOptions.SetSkip(skip)
-
-	cursor, err := collection.Find(context.Background(), bson.D{}, findOptions)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error finding documents: %s", err)})
-		return
-	}
-	defer cursor.Close(context.Background())
-
-	var movies []bson.M
-	if err := cursor.All(context.Background(), &movies); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error decoding documents: %s", err)})
-		return
-	}
-
-	c.JSON(http.StatusOK, movies)
-}
-
+/*
 func GetComments(c *gin.Context) {
 	pageStr := c.Query("page")
 	sizeStr := c.Query("size")
@@ -246,3 +187,4 @@ func CreateComment(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Comment created successfully", "id": result.InsertedID})
 }
+*/

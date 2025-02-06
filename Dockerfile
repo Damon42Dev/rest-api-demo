@@ -5,6 +5,7 @@ WORKDIR /rest-api-demo
 COPY go.mod go.sum ./
 RUN go mod download
 COPY *.go ./
+COPY . ./
 # Copy the .env file
 COPY .env ./
 # List files to verify .env is copied
