@@ -1,71 +1,37 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"net/http"
-	"strconv"
+	"example/rest-api-demo/config"
+	"example/rest-api-demo/routes"
+	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
-
-	"example/rest-api-demo/config"
 )
 
 // var db *mongo.Database
 
 func main() {
-	config.Connect()
+	config.LoadEnv()
+	config.ConnectDB()
 
-	server := gin.Default()
-	server.GET("/movies", GetMovies)
-	// server.GET("/comments", GetComments)
-	// server.GET("/comments/:id", GetCommentByID)
-	// server.POST("/comments", CreateComment)
-	// server.PUT("/comments/:id", UpdateCommentByID)
-	// server.DELETE("/comments/:id", DeleteCommentByID)
+	router := gin.Default()
 
-	// server.GET("/movies/:id", GetMovieByID)
-	server.Run(":8080")
-}
+	// Register API routes
+	routes.RegisterRoutes(router)
 
-func GetMovies(c *gin.Context) {
-	pageStr := c.Query("page")
-	sizeStr := c.Query("size")
-	page, err := strconv.Atoi(pageStr)
-	if err != nil || page < 1 {
-		page = 1
+	// Get port from environment or use default 8080
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
 
-	size, err := strconv.Atoi(sizeStr)
-
-	if err != nil || size < 1 {
-		size = 10
-	}
-
-	limit := int64(10)
-	skip := int64((page - 1) * 10)
-
-	collection := config.GetCollection("movies")
-	findOptions := options.Find()
-	findOptions.SetLimit(limit)
-	findOptions.SetSkip(skip)
-
-	cursor, err := collection.Find(context.Background(), bson.D{}, findOptions)
+	// Start the server
+	log.Printf("Server running on port %s\n", port)
+	err := router.Run(":" + port)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error finding documents: %s", err)})
-		return
+		log.Fatal("Failed to start server:", err)
 	}
-	defer cursor.Close(context.Background())
-
-	var movies []bson.M
-	if err := cursor.All(context.Background(), &movies); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error decoding documents: %s", err)})
-		return
-	}
-
-	c.JSON(http.StatusOK, movies)
 }
 
 /*
