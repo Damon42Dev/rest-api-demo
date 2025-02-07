@@ -18,3 +18,15 @@ func GetMovies(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, movies)
 }
+
+func GetComments(c *gin.Context) {
+	pageStr := c.Query("page")
+	sizeStr := c.Query("size")
+
+	comments, err := repositories.GetComments(pageStr, sizeStr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve comments"})
+		return
+	}
+	c.JSON(http.StatusOK, comments)
+}
