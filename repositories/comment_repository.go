@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetMovies(pageStr, sizeStr string) ([]models.Movie, error) {
+func GetComments(pageStr, sizeStr string) ([]models.Comment, error) {
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page < 1 {
 		page = 1
@@ -27,8 +27,8 @@ func GetMovies(pageStr, sizeStr string) ([]models.Movie, error) {
 	limit := int64(10)
 	skip := int64((page - 1) * 10)
 
-	var movies []models.Movie
-	collection := config.GetCollection("movies")
+	var comments []models.Comment
+	collection := config.GetCollection("comments")
 	findOptions := options.Find()
 	findOptions.SetLimit(limit)
 	findOptions.SetSkip(skip)
@@ -38,19 +38,19 @@ func GetMovies(pageStr, sizeStr string) ([]models.Movie, error) {
 
 	cursor, err := collection.Find(context.Background(), bson.D{}, findOptions)
 	if err != nil {
-		log.Println("Error fetching movies:", err)
+		log.Println("Error fetching comments:", err)
 		return nil, err
 	}
 	defer cursor.Close(ctx)
 
 	for cursor.Next(ctx) {
-		var movie models.Movie
-		if err := cursor.Decode(&movie); err != nil {
-			log.Println("Error decoding movie:", err)
+		var comment models.Comment
+		if err := cursor.Decode(&comment); err != nil {
+			log.Println("Error decoding comment:", err)
 			return nil, err
 		}
-		movies = append(movies, movie)
+		comments = append(comments, comment)
 	}
 
-	return movies, nil
+	return comments, nil
 }
