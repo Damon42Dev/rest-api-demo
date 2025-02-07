@@ -35,43 +35,6 @@ func main() {
 }
 
 /*
-func GetComments(c *gin.Context) {
-	pageStr := c.Query("page")
-	sizeStr := c.Query("size")
-	page, err := strconv.Atoi(pageStr)
-	size, err := strconv.Atoi(sizeStr)
-	if err != nil || page < 1 {
-		page = 1
-	}
-
-	if err != nil || size < 1 {
-		size = 1
-	}
-
-	limit := int64(size)
-	skip := int64((page - 1) * 10)
-
-	collection := db.Collection("comments")
-	findOptions := options.Find()
-	findOptions.SetLimit(limit)
-	findOptions.SetSkip(skip)
-
-	cursor, err := collection.Find(context.Background(), bson.D{}, findOptions)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error finding documents: %s", err)})
-		return
-	}
-	defer cursor.Close(context.Background())
-
-	var comments []bson.M
-	if err := cursor.All(context.Background(), &comments); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error decoding documents: %s", err)})
-		return
-	}
-
-	c.JSON(http.StatusOK, comments)
-}
-
 func GetCommentByID(c *gin.Context) {
 	id := c.Param("id")
 	objID, err := primitive.ObjectIDFromHex(id)
