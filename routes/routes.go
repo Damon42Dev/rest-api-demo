@@ -11,9 +11,8 @@ func RegisterRoutes(r *gin.Engine) {
 	r.GET("/movies/:id", controllers.GetMovieByID)
 
 	r.GET("/comments", controllers.GetComments)
-	// server.GET("/comments/:id", GetCommentByID)
+	r.GET("/comments/:id", controllers.GetCommentByID)
 	// server.POST("/comments", CreateComment)
 	// server.PUT("/comments/:id", UpdateCommentByID)
 	// server.DELETE("/comments/:id", DeleteCommentByID)
-
 }

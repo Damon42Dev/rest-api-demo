@@ -49,3 +49,20 @@ func GetComments(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, comments)
 }
+
+func GetCommentByID(c *gin.Context) {
+	id := c.Param("id")
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	movie, err := repositories.GetCommentByID(objID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve comment by ID: %s", objID.Hex())})
+		return
+	}
+
+	c.JSON(http.StatusOK, movie)
+}

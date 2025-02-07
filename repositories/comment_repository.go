@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -53,4 +55,25 @@ func GetComments(pageStr, sizeStr string) ([]models.Comment, error) {
 	}
 
 	return comments, nil
+}
+
+func GetCommentByID(objID primitive.ObjectID) (models.Comment, error) {
+
+	var comment models.Comment
+	collection := config.GetCollection("comments")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&comment)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			log.Println("Comment not found")
+		} else {
+			log.Println("Error finding document:", err)
+		}
+		return comment, err
+	}
+
+	return comment, nil
 }

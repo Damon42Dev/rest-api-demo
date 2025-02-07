@@ -2,9 +2,11 @@
 FROM golang:1.21-bullseye AS builder
 WORKDIR /rest-api-demo
 
-# Copy evenything from the current directory to  the container
-COPY . ./
+# Copy go mod and sum files
+COPY go.mod go.sum ./
 RUN go mod download
+
+COPY . ./
 RUN CGO_ENABLED=0 GOOS=linux go build -o /go-docker-multistage
 
 # final stage
