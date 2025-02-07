@@ -8,11 +8,12 @@ import (
 
 func RegisterRoutes(r *gin.Engine) {
 	r.GET("/movies", controllers.GetMovies)
+	r.GET("/movies/:id", controllers.GetMovieByID)
+
 	r.GET("/comments", controllers.GetComments)
 	// server.GET("/comments/:id", GetCommentByID)
 	// server.POST("/comments", CreateComment)
 	// server.PUT("/comments/:id", UpdateCommentByID)
 	// server.DELETE("/comments/:id", DeleteCommentByID)
 
-	// server.GET("/movies/:id", GetMovieByID)
 }
