@@ -83,3 +83,26 @@ func DeleteCommentByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Comment deleted successfully"})
 }
+
+func UpdateCommentByID(c *gin.Context) {
+	id := c.Param("id")
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	var updateData map[string]interface{}
+	if err := c.BindJSON(&updateData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	err = repositories.UpdateCommentByID(objID, updateData)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error updating document: %s", err)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Comment updated successfully"})
+}

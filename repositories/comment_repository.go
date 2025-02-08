@@ -90,3 +90,18 @@ func DeleteCommentByID(objID primitive.ObjectID) error {
 
 	return nil
 }
+
+func UpdateCommentByID(objID primitive.ObjectID, updateData bson.M) error {
+	collection := config.GetCollection("comments")
+	update := bson.M{"$set": updateData}
+	result, err := collection.UpdateOne(context.Background(), bson.M{"_id": objID}, update)
+	if err != nil {
+		return err
+	}
+
+	if result.MatchedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}
