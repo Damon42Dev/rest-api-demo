@@ -12,7 +12,7 @@ func RegisterRoutes(r *gin.Engine) {
 
 	r.GET("/comments", controllers.GetComments)
 	r.GET("/comments/:id", controllers.GetCommentByID)
+	r.DELETE("/comments/:id", controllers.DeleteCommentByID)
 	// server.POST("/comments", CreateComment)
 	// server.PUT("/comments/:id", UpdateCommentByID)
-	// server.DELETE("/comments/:id", DeleteCommentByID)
 }

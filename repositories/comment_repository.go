@@ -58,7 +58,6 @@ func GetComments(pageStr, sizeStr string) ([]models.Comment, error) {
 }
 
 func GetCommentByID(objID primitive.ObjectID) (models.Comment, error) {
-
 	var comment models.Comment
 	collection := config.GetCollection("comments")
 
@@ -76,4 +75,18 @@ func GetCommentByID(objID primitive.ObjectID) (models.Comment, error) {
 	}
 
 	return comment, nil
+}
+
+func DeleteCommentByID(objID primitive.ObjectID) error {
+	collection := config.GetCollection("comments")
+	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": objID})
+	if err != nil {
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
 }
