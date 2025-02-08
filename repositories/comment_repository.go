@@ -105,3 +105,13 @@ func UpdateCommentByID(objID primitive.ObjectID, updateData bson.M) error {
 
 	return nil
 }
+
+func CreateComment(comment models.Comment) (primitive.ObjectID, error) {
+	collection := config.GetCollection("comments")
+	result, err := collection.InsertOne(context.Background(), comment)
+	if err != nil {
+		return primitive.NilObjectID, err
+	}
+
+	return result.InsertedID.(primitive.ObjectID), nil
+}

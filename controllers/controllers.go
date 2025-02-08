@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"example/rest-api-demo/models"
 	"example/rest-api-demo/repositories"
 	"fmt"
 	"net/http"
@@ -105,4 +106,22 @@ func UpdateCommentByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Comment updated successfully"})
+}
+
+func CreateComment(c *gin.Context) {
+	var comment models.Comment
+	if err := c.BindJSON(&comment); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	id, err := repositories.CreateComment(comment)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,
+			gin.H{"error": fmt.Sprintf("Error inserting document: %s", err)})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Comment created successfully",
+		"id": id.Hex()})
 }
