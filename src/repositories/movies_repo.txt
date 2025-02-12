@@ -2,11 +2,12 @@ package repositories
 
 import (
 	"context"
-	"example/rest-api-demo/config"
-	"example/rest-api-demo/models"
 	"log"
 	"strconv"
 	"time"
+
+	"example/rest-api-demo/src/config"
+	"example/rest-api-demo/src/models"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

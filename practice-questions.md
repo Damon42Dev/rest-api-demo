@@ -17,17 +17,11 @@ Requirement
 Happy coding :)
 
 TODOs: 
-1. redis cache -> Optional
-2. anyone can run this prioject with READ ME
-3. put env filter -> clean project archetecture -> buttons/delivery/rest/handler.go
+1. 
+comment of movies needs to be connected to Movie. Passing the movie id in the route
 
-API Planning:
+movies/:id/comments -> it shows all the comments of a specific move(id)
 
-GET /movies     -> with pagination in a limit of 10
-GET /movies/<id>
-GET /comments   -> with pagination in a limit of 10
-GET /comments/<id>
+movies/:movie_id/comments/:comment_id
 
-POST /comments
-PUT  /comments/<id>
-DELETE /comments/<id>
+2. Inetrface

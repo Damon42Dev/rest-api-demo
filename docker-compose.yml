@@ -24,7 +24,7 @@ services:
 
   mongo-seed:
     build: 
-      context: ./mongo-seed
+      context: ./src/mongo-seed
       dockerfile: Dockerfile
     container_name: mongo-seed
     environment:
