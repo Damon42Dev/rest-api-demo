@@ -7,9 +7,9 @@ type Configuration struct {
 }
 
 type DatabaseSetting struct {
-	Uri        string
-	DbName     string
-	Collection string
+	Uri         string
+	DbName      string
+	Collections []string
 }
 
 type ServerSettings struct {

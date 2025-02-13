@@ -31,6 +31,11 @@ type commentsController struct {
 }
 
 func NewCommentsController(client *mongo.Client, repo repositories.CommentsRepository, config utils.Configuration) CommentsController {
+	// log.Println("Creating new comments controller...")
+	// log.Printf("App Name: %s, Timeout: %d", config.App.Name, config.App.Timeout)
+	// log.Printf("Database URI: %s, Database Name: %s, Collection: %s", config.Database.Uri, config.Database.DbName, config.Database.Collections)
+	// log.Printf("Server Port: %s", config.Server.Port)
+
 	return &commentsController{client: client, commentsRepository: repo, config: config}
 }
 
@@ -40,19 +45,21 @@ func (cc *commentsController) GetComments(c *gin.Context) {
 	defer ctxErr()
 
 	var commentModel []*models.Comment
-
-	tParam := c.Param("take")
-	take, err := strconv.Atoi(tParam)
-	if err != nil {
-		log.Fatal("Take parameter can not be converted.")
+	takeStr := c.Query("take")
+	take, err := strconv.Atoi(takeStr)
+	if err != nil || take < 1 {
+		take = 1
 	}
+
+	log.Printf("GetComments Take %d", take)
+	log.Printf("GetComments Context %v", ctx)
 
 	result, err := cc.commentsRepository.GetComments(take, ctx)
+	log.Printf("GetComments Result %v", result)
 	if err != mongo.ErrNilCursor {
 		// utils.BadRequestError("AppDoc_Handler_List", err, map[string]interface{}{"Data": take})
-		log.Fatal("Error getting comments")
+		log.Printf("Error getting comments")
 	}
-	// logrus.Infof("Len %d", len(result))
 
 	//convert to entity to model
 	for _, item := range result {
