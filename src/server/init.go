@@ -21,9 +21,12 @@ func Initialize(config utils.Configuration) {
 	comments_repository := repositories.NewCommentMongodbRepo(&config, client)
 	comments_controller := controllers.NewCommentsController(client, comments_repository, config)
 
+	movies_repository := repositories.NewMovieMongodbRepo(&config, client)
+	movies_controller := controllers.NewMoviesController(client, movies_repository, config)
+
 	// Creates a gin router with default middleware:
 	r := gin.Default()
-	routes.RegisterRoutes(r, comments_controller)
+	routes.RegisterRoutes(r, comments_controller, movies_controller)
 
 	r.Run(":8080")
 }

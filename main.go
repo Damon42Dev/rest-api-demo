@@ -12,8 +12,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// var db *mongo.Database
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -41,13 +39,6 @@ func read_configuration() utils.Configuration {
 
 	// Split collectionsStr into a slice of strings
 	collections := strings.Split(collectionsStr, ",")
-
-	// log.Printf("Mongo URL: %s", mongoUrl)
-	// log.Printf("Port: %s", port)
-	// log.Printf("DB Name: %s", dbName)
-	// log.Printf("Collection: %s", collectionsStr)
-	// log.Printf("App Name: %s", appName)
-	// log.Printf("Request Timeout: %d", requestTimeOut)
 
 	return utils.Configuration{
 		App:      utils.Application{Name: appName, Timeout: requestTimeOut},

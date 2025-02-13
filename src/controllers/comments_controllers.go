@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"example/rest-api-demo/src/models"
@@ -18,10 +18,11 @@ import (
 type CommentsController interface {
 	// Healthcheck(*gin.Context)
 
-	// Add(*gin.Context)
+	CreateComment(*gin.Context)
 	GetComments(*gin.Context)
-	// GetById(*gin.Context)
-	// Delete(*gin.Context)
+	GetCommentByID(*gin.Context)
+	DeleteCommentByID(*gin.Context)
+	UpdateCommentByID(*gin.Context)
 }
 
 type commentsController struct {
@@ -31,11 +32,6 @@ type commentsController struct {
 }
 
 func NewCommentsController(client *mongo.Client, repo repositories.CommentsRepository, config utils.Configuration) CommentsController {
-	// log.Println("Creating new comments controller...")
-	// log.Printf("App Name: %s, Timeout: %d", config.App.Name, config.App.Timeout)
-	// log.Printf("Database URI: %s, Database Name: %s, Collection: %s", config.Database.Uri, config.Database.DbName, config.Database.Collections)
-	// log.Printf("Server Port: %s", config.Server.Port)
-
 	return &commentsController{client: client, commentsRepository: repo, config: config}
 }
 
@@ -45,19 +41,10 @@ func (cc *commentsController) GetComments(c *gin.Context) {
 	defer ctxErr()
 
 	var commentModel []*models.Comment
-	takeStr := c.Query("take")
-	take, err := strconv.Atoi(takeStr)
-	if err != nil || take < 1 {
-		take = 1
-	}
+	pagination := utils.GetPaginationParams(c, 1, 5)
 
-	log.Printf("GetComments Take %d", take)
-	log.Printf("GetComments Context %v", ctx)
-
-	result, err := cc.commentsRepository.GetComments(take, ctx)
-	log.Printf("GetComments Result %v", result)
+	result, err := cc.commentsRepository.GetComments(pagination.Page, pagination.Size, ctx)
 	if err != mongo.ErrNilCursor {
-		// utils.BadRequestError("AppDoc_Handler_List", err, map[string]interface{}{"Data": take})
 		log.Printf("Error getting comments")
 	}
 
@@ -69,77 +56,75 @@ func (cc *commentsController) GetComments(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, map[string]interface{}{"Data": commentModel})
 }
 
-// func GetCommentByID(c *gin.Context) {
-// 	id := c.Param("id")
-// 	objID, err := primitive.ObjectIDFromHex(id)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
-// 		return
-// 	}
+func (cc *commentsController) GetCommentByID(c *gin.Context) {
+	ctx, ctxErr := context.WithTimeout(c.Request.Context(), time.Duration(cc.config.App.Timeout)*time.Second)
+	defer ctxErr()
 
-// 	movie, err := repositories.GetCommentByID(objID)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve comment by ID: %s", objID.Hex())})
-// 		return
-// 	}
+	objID, valid := utils.GetObjectIDFromParam(c, "id")
+	if !valid {
+		return
+	}
 
-// 	c.JSON(http.StatusOK, movie)
-// }
+	comment, err := cc.commentsRepository.GetCommentByID(objID, ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve comment by ID: %s", objID.Hex())})
+		return
+	}
 
-// func DeleteCommentByID(c *gin.Context) {
-// 	id := c.Param("id")
-// 	objID, err := primitive.ObjectIDFromHex(id)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
-// 		return
-// 	}
+	c.JSON(http.StatusOK, comment)
+}
 
-// 	err = repositories.DeleteCommentByID(objID)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error deleting document: %s", err)})
-// 		return
-// 	}
+func (cc *commentsController) DeleteCommentByID(c *gin.Context) {
+	objID, valid := utils.GetObjectIDFromParam(c, "id")
+	if !valid {
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"message": "Comment deleted successfully"})
-// }
+	err := cc.commentsRepository.DeleteCommentByID(objID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error deleting document: %s", err)})
+		return
+	}
 
-// func UpdateCommentByID(c *gin.Context) {
-// 	id := c.Param("id")
-// 	objID, err := primitive.ObjectIDFromHex(id)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
-// 		return
-// 	}
+	c.JSON(http.StatusOK, gin.H{"message": "Comment deleted successfully"})
+}
 
-// 	var updateData map[string]interface{}
-// 	if err := c.BindJSON(&updateData); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-// 		return
-// 	}
+func (cc *commentsController) UpdateCommentByID(c *gin.Context) {
+	objID, valid := utils.GetObjectIDFromParam(c, "id")
+	if !valid {
+		return
+	}
 
-// 	err = repositories.UpdateCommentByID(objID, updateData)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error updating document: %s", err)})
-// 		return
-// 	}
+	var updateData map[string]interface{}
+	if err := c.BindJSON(&updateData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"message": "Comment updated successfully"})
-// }
+	err := cc.commentsRepository.UpdateCommentByID(objID, updateData)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error updating document: %s", err)})
+		return
+	}
 
-// func CreateComment(c *gin.Context) {
-// 	var comment models.Comment
-// 	if err := c.BindJSON(&comment); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-// 		return
-// 	}
+	c.JSON(http.StatusOK, gin.H{"message": "Comment updated successfully"})
+}
 
-// 	id, err := repositories.CreateComment(comment)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError,
-// 			gin.H{"error": fmt.Sprintf("Error inserting document: %s", err)})
-// 		return
-// 	}
+func (cc *commentsController) CreateComment(c *gin.Context) {
+	var comment models.Comment
+	if err := c.BindJSON(&comment); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
 
-// 	c.JSON(http.StatusCreated, gin.H{"message": "Comment created successfully",
-// 		"id": id.Hex()})
-// }
+	id, err := cc.commentsRepository.CreateComment(comment)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,
+			gin.H{"error": fmt.Sprintf("Error inserting document: %s", err)})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Comment created successfully",
+		"id": id.Hex()})
+}
