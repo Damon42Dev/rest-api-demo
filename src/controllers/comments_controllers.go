@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"example/rest-api-demo/src/models"
@@ -31,11 +30,6 @@ type commentsController struct {
 }
 
 func NewCommentsController(client *mongo.Client, repo repositories.CommentsRepository, config utils.Configuration) CommentsController {
-	// log.Println("Creating new comments controller...")
-	// log.Printf("App Name: %s, Timeout: %d", config.App.Name, config.App.Timeout)
-	// log.Printf("Database URI: %s, Database Name: %s, Collection: %s", config.Database.Uri, config.Database.DbName, config.Database.Collections)
-	// log.Printf("Server Port: %s", config.Server.Port)
-
 	return &commentsController{client: client, commentsRepository: repo, config: config}
 }
 
@@ -45,26 +39,10 @@ func (cc *commentsController) GetComments(c *gin.Context) {
 	defer ctxErr()
 
 	var commentModel []*models.Comment
-	pageStr := c.Query("page")
-	page, err := strconv.Atoi(pageStr)
-	if err != nil || page < 1 {
-		page = 1
-	}
+	pagination := utils.GetPaginationParams(c, 1, 5)
 
-	sizeStr := c.Query("size")
-
-	size, err := strconv.Atoi(sizeStr)
-	if err != nil || size < 1 {
-		size = 5
-	}
-
-	log.Printf("GetComments Take %d", size)
-	log.Printf("GetComments Context %v", ctx)
-
-	result, err := cc.commentsRepository.GetComments(page, size, ctx)
-	log.Printf("GetComments Result %v", result)
+	result, err := cc.commentsRepository.GetComments(pagination.Page, pagination.Size, ctx)
 	if err != mongo.ErrNilCursor {
-		// utils.BadRequestError("AppDoc_Handler_List", err, map[string]interface{}{"Data": take})
 		log.Printf("Error getting comments")
 	}
 
