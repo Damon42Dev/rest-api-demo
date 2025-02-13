@@ -18,7 +18,7 @@ import (
 type CommentsController interface {
 	// Healthcheck(*gin.Context)
 
-	// Add(*gin.Context)
+	CreateComment(*gin.Context)
 	GetComments(*gin.Context)
 	GetCommentByID(*gin.Context)
 	DeleteCommentByID(*gin.Context)
@@ -110,20 +110,21 @@ func (cc *commentsController) UpdateCommentByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Comment updated successfully"})
 }
 
-// func CreateComment(c *gin.Context) {
-// 	var comment models.Comment
-// 	if err := c.BindJSON(&comment); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-// 		return
-// 	}
+func (cc *commentsController) CreateComment(c *gin.Context) {
+	var comment models.Comment
+	if err := c.BindJSON(&comment); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
 
-// 	id, err := repositories.CreateComment(comment)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError,
-// 			gin.H{"error": fmt.Sprintf("Error inserting document: %s", err)})
-// 		return
-// 	}
+	id, err := cc.commentsRepository.CreateComment(comment)
 
-// 	c.JSON(http.StatusCreated, gin.H{"message": "Comment created successfully",
-// 		"id": id.Hex()})
-// }
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,
+			gin.H{"error": fmt.Sprintf("Error inserting document: %s", err)})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Comment created successfully",
+		"id": id.Hex()})
+}

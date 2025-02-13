@@ -14,12 +14,11 @@ import (
 )
 
 type CommentsRepository interface {
-	// Add(appDoc entity.AppDoc, ctx context.Context) (primitive.ObjectID, error)
+	CreateComment(comment models.Comment) (primitive.ObjectID, error)
 	GetComments(page, size int, ctx context.Context) ([]*models.Comment, error)
 	GetCommentByID(objID primitive.ObjectID, ctx context.Context) (*models.Comment, error)
 	DeleteCommentByID(objID primitive.ObjectID) error
 	UpdateCommentByID(objID primitive.ObjectID, updateData bson.M) error
-	// Delete(oId primitive.ObjectID, ctx context.Context) (int64, error)
 }
 
 type commentsRepository struct {
@@ -104,12 +103,13 @@ func (mcr commentsRepository) UpdateCommentByID(objID primitive.ObjectID, update
 	return nil
 }
 
-// func CreateComment(comment models.Comment) (primitive.ObjectID, error) {
-// 	collection := config.GetCollection("comments")
-// 	result, err := collection.InsertOne(context.Background(), comment)
-// 	if err != nil {
-// 		return primitive.NilObjectID, err
-// 	}
+func (mcr commentsRepository) CreateComment(comment models.Comment) (primitive.ObjectID, error) {
+	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[0])
 
-// 	return result.InsertedID.(primitive.ObjectID), nil
-// }
+	result, err := collection.InsertOne(context.Background(), comment)
+	if err != nil {
+		return primitive.NilObjectID, err
+	}
+
+	return result.InsertedID.(primitive.ObjectID), nil
+}
