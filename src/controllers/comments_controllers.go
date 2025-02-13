@@ -22,6 +22,7 @@ type CommentsController interface {
 	GetComments(*gin.Context)
 	GetCommentByID(*gin.Context)
 	DeleteCommentByID(*gin.Context)
+	UpdateCommentByID(*gin.Context)
 }
 
 type commentsController struct {
@@ -88,28 +89,26 @@ func (cc *commentsController) DeleteCommentByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Comment deleted successfully"})
 }
 
-// func UpdateCommentByID(c *gin.Context) {
-// 	id := c.Param("id")
-// 	objID, err := primitive.ObjectIDFromHex(id)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
-// 		return
-// 	}
+func (cc *commentsController) UpdateCommentByID(c *gin.Context) {
+	objID, valid := utils.GetObjectIDFromParam(c, "id")
+	if !valid {
+		return
+	}
 
-// 	var updateData map[string]interface{}
-// 	if err := c.BindJSON(&updateData); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-// 		return
-// 	}
+	var updateData map[string]interface{}
+	if err := c.BindJSON(&updateData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
 
-// 	err = repositories.UpdateCommentByID(objID, updateData)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error updating document: %s", err)})
-// 		return
-// 	}
+	err := cc.commentsRepository.UpdateCommentByID(objID, updateData)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error updating document: %s", err)})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"message": "Comment updated successfully"})
-// }
+	c.JSON(http.StatusOK, gin.H{"message": "Comment updated successfully"})
+}
 
 // func CreateComment(c *gin.Context) {
 // 	var comment models.Comment
