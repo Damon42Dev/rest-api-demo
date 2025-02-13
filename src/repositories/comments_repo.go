@@ -33,8 +33,6 @@ func (mcr commentsRepository) GetComments(page, size int, ctx context.Context) (
 	findOptions.SetLimit(int64(size))
 	findOptions.SetSkip(int64((page - 1) * size))
 
-	// log.Println("Getting comments...", mcr.config.Database.DbName)
-	// log.Println("Getting comments...", mcr.config.Database.Collections[0])
 	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[0])
 	cursor, err := collection.Find(ctx, bson.D{}, findOptions)
 	if err != nil {
