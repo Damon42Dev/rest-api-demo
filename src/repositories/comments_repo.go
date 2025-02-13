@@ -14,7 +14,7 @@ import (
 
 type CommentsRepository interface {
 	// Add(appDoc entity.AppDoc, ctx context.Context) (primitive.ObjectID, error)
-	GetComments(count int, ctx context.Context) ([]*models.Comment, error)
+	GetComments(page, size int, ctx context.Context) ([]*models.Comment, error)
 	// GetById(oId primitive.ObjectID, ctx context.Context) (*entity.AppDoc, error)
 	// Delete(oId primitive.ObjectID, ctx context.Context) (int64, error)
 }
@@ -28,9 +28,10 @@ func NewCommentMongodbRepo(config *utils.Configuration, client *mongo.Client) Co
 	return &commentsRepository{config: config, client: client}
 }
 
-func (mcr commentsRepository) GetComments(count int, ctx context.Context) ([]*models.Comment, error) {
+func (mcr commentsRepository) GetComments(page, size int, ctx context.Context) ([]*models.Comment, error) {
 	findOptions := options.Find()
-	findOptions.SetLimit(int64(count))
+	findOptions.SetLimit(int64(size))
+	findOptions.SetSkip(int64((page - 1) * size))
 
 	// log.Println("Getting comments...", mcr.config.Database.DbName)
 	// log.Println("Getting comments...", mcr.config.Database.Collections[0])

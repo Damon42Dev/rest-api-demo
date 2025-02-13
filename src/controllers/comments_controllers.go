@@ -45,16 +45,23 @@ func (cc *commentsController) GetComments(c *gin.Context) {
 	defer ctxErr()
 
 	var commentModel []*models.Comment
-	takeStr := c.Query("take")
-	take, err := strconv.Atoi(takeStr)
-	if err != nil || take < 1 {
-		take = 1
+	pageStr := c.Query("page")
+	page, err := strconv.Atoi(pageStr)
+	if err != nil || page < 1 {
+		page = 1
 	}
 
-	log.Printf("GetComments Take %d", take)
+	sizeStr := c.Query("size")
+
+	size, err := strconv.Atoi(sizeStr)
+	if err != nil || size < 1 {
+		size = 5
+	}
+
+	log.Printf("GetComments Take %d", size)
 	log.Printf("GetComments Context %v", ctx)
 
-	result, err := cc.commentsRepository.GetComments(take, ctx)
+	result, err := cc.commentsRepository.GetComments(page, size, ctx)
 	log.Printf("GetComments Result %v", result)
 	if err != mongo.ErrNilCursor {
 		// utils.BadRequestError("AppDoc_Handler_List", err, map[string]interface{}{"Data": take})

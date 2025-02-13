@@ -1,1 +1,1 @@
-GET http://localhost:8080/comments?take=10
+GET http://localhost:8080/comments?page=2&size=10
