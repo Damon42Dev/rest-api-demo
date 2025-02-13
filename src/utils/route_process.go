@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // PaginationParams holds the pagination parameters
@@ -30,4 +32,15 @@ func GetPaginationParams(c *gin.Context, defaultPage, defaultSize int) Paginatio
 		Page: page,
 		Size: size,
 	}
+}
+
+// GetObjectIDFromParam extracts and validates a MongoDB ObjectID from a URL parameter
+func GetObjectIDFromParam(c *gin.Context, param string) (primitive.ObjectID, bool) {
+	id := c.Param(param)
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return primitive.NilObjectID, false
+	}
+	return objID, true
 }

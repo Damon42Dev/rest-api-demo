@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -19,7 +20,7 @@ type CommentsController interface {
 
 	// Add(*gin.Context)
 	GetComments(*gin.Context)
-	// GetById(*gin.Context)
+	GetCommentByID(*gin.Context)
 	// Delete(*gin.Context)
 }
 
@@ -54,22 +55,23 @@ func (cc *commentsController) GetComments(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, map[string]interface{}{"Data": commentModel})
 }
 
-// func GetCommentByID(c *gin.Context) {
-// 	id := c.Param("id")
-// 	objID, err := primitive.ObjectIDFromHex(id)
-// 	if err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
-// 		return
-// 	}
+func (cc *commentsController) GetCommentByID(c *gin.Context) {
+	ctx, ctxErr := context.WithTimeout(c.Request.Context(), time.Duration(cc.config.App.Timeout)*time.Second)
+	defer ctxErr()
 
-// 	movie, err := repositories.GetCommentByID(objID)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve comment by ID: %s", objID.Hex())})
-// 		return
-// 	}
+	objID, valid := utils.GetObjectIDFromParam(c, "id")
+	if !valid {
+		return
+	}
 
-// 	c.JSON(http.StatusOK, movie)
-// }
+	comment, err := cc.commentsRepository.GetCommentByID(objID, ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve comment by ID: %s", objID.Hex())})
+		return
+	}
+
+	c.JSON(http.StatusOK, comment)
+}
 
 // func DeleteCommentByID(c *gin.Context) {
 // 	id := c.Param("id")

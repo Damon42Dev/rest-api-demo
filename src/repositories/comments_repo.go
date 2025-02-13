@@ -8,6 +8,7 @@ import (
 	"example/rest-api-demo/src/utils"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -15,7 +16,7 @@ import (
 type CommentsRepository interface {
 	// Add(appDoc entity.AppDoc, ctx context.Context) (primitive.ObjectID, error)
 	GetComments(page, size int, ctx context.Context) ([]*models.Comment, error)
-	// GetById(oId primitive.ObjectID, ctx context.Context) (*entity.AppDoc, error)
+	GetCommentByID(objID primitive.ObjectID, ctx context.Context) (*models.Comment, error)
 	// Delete(oId primitive.ObjectID, ctx context.Context) (int64, error)
 }
 
@@ -53,25 +54,22 @@ func (mcr commentsRepository) GetComments(page, size int, ctx context.Context) (
 	return comments, nil
 }
 
-// func (mcr MongoDBCommentRepo) GetCommentByID(objID primitive.ObjectID) (models.Comment, error) {
-// 	var comment models.Comment
-// 	collection := config.GetCollection("comments")
+func (mcr commentsRepository) GetCommentByID(objID primitive.ObjectID, ctx context.Context) (*models.Comment, error) {
+	var comment *models.Comment
+	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[0])
 
-// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
+	err := collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&comment)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			log.Println("Comment not found")
+		} else {
+			log.Println("Error finding document:", err)
+		}
+		return comment, err
+	}
 
-// 	err := collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&comment)
-// 	if err != nil {
-// 		if err == mongo.ErrNoDocuments {
-// 			log.Println("Comment not found")
-// 		} else {
-// 			log.Println("Error finding document:", err)
-// 		}
-// 		return comment, err
-// 	}
-
-// 	return comment, nil
-// }
+	return comment, nil
+}
 
 // func DeleteCommentByID(objID primitive.ObjectID) error {
 // 	collection := config.GetCollection("comments")
