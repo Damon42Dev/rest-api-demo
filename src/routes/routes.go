@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(r *gin.Engine, commentController controllers.CommentsController) {
-	// r.GET("/movies", controllers.GetMovies)
-	// r.GET("/movies/:id", controllers.GetMovieByID)
+func RegisterRoutes(r *gin.Engine, commentController controllers.CommentsController, movieController controllers.MoviesController) {
+	r.GET("/movies", movieController.GetMovies)
+	r.GET("/movies/:id", movieController.GetMovieByID)
 
 	r.GET("/comments", commentController.GetComments)
 	r.GET("/comments/:id", commentController.GetCommentByID)
