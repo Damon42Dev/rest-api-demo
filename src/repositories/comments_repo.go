@@ -17,6 +17,7 @@ type CommentsRepository interface {
 	// Add(appDoc entity.AppDoc, ctx context.Context) (primitive.ObjectID, error)
 	GetComments(page, size int, ctx context.Context) ([]*models.Comment, error)
 	GetCommentByID(objID primitive.ObjectID, ctx context.Context) (*models.Comment, error)
+	DeleteCommentByID(objID primitive.ObjectID) error
 	// Delete(oId primitive.ObjectID, ctx context.Context) (int64, error)
 }
 
@@ -71,19 +72,20 @@ func (mcr commentsRepository) GetCommentByID(objID primitive.ObjectID, ctx conte
 	return comment, nil
 }
 
-// func DeleteCommentByID(objID primitive.ObjectID) error {
-// 	collection := config.GetCollection("comments")
-// 	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": objID})
-// 	if err != nil {
-// 		return err
-// 	}
+func (mcr commentsRepository) DeleteCommentByID(objID primitive.ObjectID) error {
+	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[0])
 
-// 	if result.DeletedCount == 0 {
-// 		return mongo.ErrNoDocuments
-// 	}
+	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": objID})
+	if err != nil {
+		return err
+	}
 
-// 	return nil
-// }
+	if result.DeletedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}
 
 // func UpdateCommentByID(objID primitive.ObjectID, updateData bson.M) error {
 // 	collection := config.GetCollection("comments")
