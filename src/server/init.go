@@ -24,9 +24,15 @@ func Initialize(config utils.Configuration) {
 	movies_repository := repositories.NewMovieMongodbRepo(&config, client)
 	movies_controller := controllers.NewMoviesController(client, movies_repository, config)
 
+	// Create an instance of the Controllers struct
+	controllers := routes.Controllers{
+		CommentsController: comments_controller,
+		MoviesController:   movies_controller,
+	}
+
 	// Creates a gin router with default middleware:
 	r := gin.Default()
-	routes.RegisterRoutes(r, comments_controller, movies_controller)
+	routes.RegisterRoutes(r, controllers)
 
 	r.Run(":8080")
 }
