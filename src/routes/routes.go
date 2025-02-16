@@ -1,18 +1,16 @@
 package routes
 
 import (
-	"example/rest-api-demo/src/controllers"
-
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(r *gin.Engine, commentController controllers.CommentsController, movieController controllers.MoviesController) {
-	r.GET("/movies", movieController.GetMovies)
-	r.GET("/movies/:id", movieController.GetMovieByID)
+func RegisterRoutes(r *gin.Engine, controllers Controllers) {
+	r.GET("/movies", controllers.MoviesController.GetMovies)
+	r.GET("/movies/:id", controllers.MoviesController.GetMovieByID)
 
-	r.GET("/comments", commentController.GetComments)
-	r.GET("/comments/:id", commentController.GetCommentByID)
-	r.DELETE("/comments/:id", commentController.DeleteCommentByID)
-	r.PUT("/comments/:id", commentController.UpdateCommentByID)
-	r.POST("/comments", commentController.CreateComment)
+	r.GET("/comments", controllers.CommentsController.GetComments)
+	r.GET("/comments/:id", controllers.CommentsController.GetCommentByID)
+	r.DELETE("/comments/:id", controllers.CommentsController.DeleteCommentByID)
+	r.PUT("/comments/:id", controllers.CommentsController.UpdateCommentByID)
+	r.POST("/comments", controllers.CommentsController.CreateComment)
 }

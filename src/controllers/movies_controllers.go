@@ -15,13 +15,8 @@ import (
 )
 
 type MoviesController interface {
-	// Healthcheck(*gin.Context)
-
-	// CreateComment(*gin.Context)
 	GetMovies(*gin.Context)
 	GetMovieByID(*gin.Context)
-	// DeleteCommentByID(*gin.Context)
-	// UpdateCommentByID(*gin.Context)
 }
 
 type moviesController struct {

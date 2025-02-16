@@ -16,8 +16,6 @@ import (
 )
 
 type CommentsController interface {
-	// Healthcheck(*gin.Context)
-
 	CreateComment(*gin.Context)
 	GetComments(*gin.Context)
 	GetCommentByID(*gin.Context)
@@ -48,7 +46,7 @@ func (cc *commentsController) GetComments(c *gin.Context) {
 		log.Printf("Error getting comments")
 	}
 
-	//convert to entity to model
+	//convert entity to model
 	for _, item := range result {
 		commentModel = append(commentModel, (*models.Comment)(item))
 	}
