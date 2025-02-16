@@ -25,10 +25,7 @@ func Initialize(config utils.Configuration) {
 	movies_controller := controllers.NewMoviesController(client, movies_repository, config)
 
 	// Create an instance of the Controllers struct
-	controllers := routes.Controllers{
-		CommentsController: comments_controller,
-		MoviesController:   movies_controller,
-	}
+	controllers := routes.NewControllers(comments_controller, movies_controller)
 
 	// Creates a gin router with default middleware:
 	r := gin.Default()
