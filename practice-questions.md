@@ -25,3 +25,47 @@ movies/:id/comments -> it shows all the comments of a specific move(id)
 movies/:movie_id/comments/:comment_id
 
 2. Inetrface
+
+3. 
+Controller -> Get Routes
+Service layer -> size and page, to deal with business logics
+Repo -> working on resources
+
+type App struct {
+	cr CommentsRepository
+	mr MoviesRepository
+	cs CommentsService
+	ms MoviesService
+}
+
+cs := NewCommentsService(cr.NewMongoRepository(mongoconnection), cr.NewRedisepository(redisconnection))
+ms := NewMoviesService(app.mr, mr.NewMovieRepository(app.config, app.client))
+
+type MoviesService interface {
+	r MoviesRepository
+}
+
+type CommentsService struct {
+	rm CommentsMongoRepository
+	rs CommentsRedisRepository
+}
+
+func (cs CommentsService) NewCommentsService(r CommentsRepository) CommentsService {
+	return &commentsService{r: r}
+}
+
+func (cs CommentsService) GetComments(page, size int, ctx context.Context) ([]*models.Comment, error) {
+	if page < 0 {
+		page = 0
+	}
+
+	page = page * size - 10
+	if cs.rs.GetComments(page, size, ctx) != nil {
+		return cs.rs.GetComments(page, size, ctx)
+	}
+
+	comments := cs.r.GetComments(page, size, ctx)
+	cs.rs.SetComments(comments, ctx)
+
+	return comments, nil
+}
