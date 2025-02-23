@@ -3,8 +3,9 @@ package server
 import (
 	"example/rest-api-demo/src/controllers"
 	"example/rest-api-demo/src/mongodb"
-	"example/rest-api-demo/src/repositories"
+	"example/rest-api-demo/src/repositories/mongodb_repo"
 	"example/rest-api-demo/src/routes"
+	"example/rest-api-demo/src/services"
 	"example/rest-api-demo/src/utils"
 	"log"
 
@@ -18,14 +19,18 @@ func Initialize(config utils.Configuration) {
 		log.Fatal(err)
 	}
 
-	comments_repository := repositories.NewCommentMongodbRepo(&config, client)
-	comments_controller := controllers.NewCommentsController(client, comments_repository, config)
+	// comments_repository := mongodb_repo.NewCommentMongodbRepo(&config, client)
+	// comments_controller := controllers.NewCommentsController(client, comments_repository, config)
 
-	movies_repository := repositories.NewMovieMongodbRepo(&config, client)
-	movies_controller := controllers.NewMoviesController(client, movies_repository, config)
+	moviesRepository := mongodb_repo.NewMovieMongodbRepo(&config, client)
+	moviesService := services.NewMoviesService(moviesRepository)
+	moviesController := controllers.NewMoviesController(client, moviesService, config)
 
 	// Create an instance of the Controllers struct
-	controllers := routes.NewControllers(comments_controller, movies_controller)
+	controllers := routes.Controllers{
+		// CommentsController: commentsController,
+		MoviesController: moviesController,
+	}
 
 	// Creates a gin router with default middleware:
 	r := gin.Default()

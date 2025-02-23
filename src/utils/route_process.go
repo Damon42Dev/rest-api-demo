@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"context"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -43,4 +45,13 @@ func GetObjectIDFromParam(c *gin.Context, param string) (primitive.ObjectID, boo
 		return primitive.NilObjectID, false
 	}
 	return objID, true
+}
+
+func GetIdStrFromParam(c *gin.Context, param string) string {
+	id := c.Param(param)
+	return id
+}
+
+func CreateContextWithTimeout(ctx context.Context, timeout time.Duration) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(ctx, timeout)
 }
