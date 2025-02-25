@@ -12,18 +12,22 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func main() {
+var config utils.Configuration
+
+func init() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
 	}
 
-	config := read_configuration()
+	config = readConfiguration()
+}
 
+func main() {
 	server.Initialize(config)
 }
 
-func read_configuration() utils.Configuration {
+func readConfiguration() utils.Configuration {
 	mongoUrl := os.Getenv("MONGODB_URI")
 	port := os.Getenv("SERVER_PORT")
 	dbName := os.Getenv("DB_NAME")
