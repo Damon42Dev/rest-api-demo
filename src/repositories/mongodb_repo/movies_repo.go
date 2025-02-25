@@ -14,7 +14,7 @@ import (
 )
 
 type MoviesRepository interface {
-	GetMovies(page, size int, ctx context.Context) ([]*models.Movie, error)
+	GetMovies(findOptions *options.FindOptions, ctx context.Context) ([]*models.Movie, error)
 	GetMovieByID(idStr string, ctx context.Context) (*models.Movie, error)
 }
 
@@ -27,11 +27,7 @@ func NewMovieMongodbRepo(config *utils.Configuration, client *mongo.Client) Movi
 	return &moviesRepository{config: config, client: client}
 }
 
-func (mcr moviesRepository) GetMovies(page, size int, ctx context.Context) ([]*models.Movie, error) {
-	findOptions := options.Find()
-	findOptions.SetLimit(int64(size))
-	findOptions.SetSkip(int64((page - 1) * size))
-
+func (mcr moviesRepository) GetMovies(findOptions *options.FindOptions, ctx context.Context) ([]*models.Movie, error) {
 	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[2])
 	cursor, err := collection.Find(ctx, bson.D{}, findOptions)
 	if err != nil {

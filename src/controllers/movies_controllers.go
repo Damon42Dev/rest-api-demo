@@ -33,9 +33,10 @@ func (mc *moviesController) GetMovies(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(mc.config.App.Timeout)*time.Second)
 	defer cancel()
 
-	pagination := utils.GetPaginationParams(c, 1, 10)
+	pageStr := c.Query("page")
+	sizeStr := c.Query("size")
 
-	movies, err := mc.moviesService.GetMovies(pagination.Page, pagination.Size, ctx)
+	movies, err := mc.moviesService.GetMovies(pageStr, sizeStr, ctx)
 	if err != nil {
 		log.Printf("Error getting movies: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve movies"})

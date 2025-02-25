@@ -14,18 +14,19 @@ type PaginationParams struct {
 	Size int
 }
 
+const DEFAULT_PAGE = 1
+const DEFAULT_SIZE = 10
+
 // GetPaginationParams extracts and validates pagination parameters from the request context
-func GetPaginationParams(c *gin.Context, defaultPage, defaultSize int) PaginationParams {
-	pageStr := c.Query("page")
+func GetPaginationParams(pageStr, sizeStr string) PaginationParams {
 	page, err := strconv.Atoi(pageStr)
 	if err != nil || page < 1 {
-		page = defaultPage
+		page = DEFAULT_PAGE
 	}
 
-	sizeStr := c.Query("size")
 	size, err := strconv.Atoi(sizeStr)
 	if err != nil || size < 1 {
-		size = defaultSize
+		size = DEFAULT_SIZE
 	}
 
 	return PaginationParams{

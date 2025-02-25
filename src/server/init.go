@@ -22,8 +22,8 @@ func Initialize(config utils.Configuration) {
 	// comments_repository := mongodb_repo.NewCommentMongodbRepo(&config, client)
 	// comments_controller := controllers.NewCommentsController(client, comments_repository, config)
 
-	moviesRepository := mongodb_repo.NewMovieMongodbRepo(&config, client)
-	moviesService := services.NewMoviesService(moviesRepository)
+	moviesMongoRepository := mongodb_repo.NewMovieMongodbRepo(&config, client)
+	moviesService := services.NewMoviesService(moviesMongoRepository)
 	moviesController := controllers.NewMoviesController(client, moviesService, config)
 
 	// Create an instance of the Controllers struct
