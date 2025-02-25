@@ -8,7 +8,7 @@ import (
 
 type MoviesService interface {
 	GetMovies(page, size int, ctx context.Context) ([]*models.Movie, error)
-	// GetMovieByID(id string, ctx context.Context) (*models.Movie, error)
+	GetMovieByID(id string, ctx context.Context) (*models.Movie, error)
 }
 
 type moviesService struct {
@@ -31,10 +31,6 @@ func (ms *moviesService) GetMovies(page, size int, ctx context.Context) ([]*mode
 	return ms.mr.GetMovies(page, size, ctx)
 }
 
-// func (ms *moviesService) GetMovieByID(id string, ctx context.Context) (*models.Movie, error) {
-// 	objectID, err := primitive.ObjectIDFromHex(id)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return ms.mr.GetMovieByID(objectID, ctx)
-// }
+func (ms *moviesService) GetMovieByID(idStr string, ctx context.Context) (*models.Movie, error) {
+	return ms.mr.GetMovieByID(idStr, ctx)
+}

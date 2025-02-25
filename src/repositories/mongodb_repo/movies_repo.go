@@ -15,7 +15,7 @@ import (
 
 type MoviesRepository interface {
 	GetMovies(page, size int, ctx context.Context) ([]*models.Movie, error)
-	GetMovieByID(objID primitive.ObjectID, ctx context.Context) (*models.Movie, error)
+	GetMovieByID(idStr string, ctx context.Context) (*models.Movie, error)
 }
 
 type moviesRepository struct {
@@ -52,11 +52,16 @@ func (mcr moviesRepository) GetMovies(page, size int, ctx context.Context) ([]*m
 	return movies, nil
 }
 
-func (mcr moviesRepository) GetMovieByID(objID primitive.ObjectID, ctx context.Context) (*models.Movie, error) {
+func (mcr moviesRepository) GetMovieByID(idStr string, ctx context.Context) (*models.Movie, error) {
+	objID, err := primitive.ObjectIDFromHex(idStr)
+	if err != nil {
+		return nil, err
+	}
+
 	var movie *models.Movie
 	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[2])
 
-	err := collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&movie)
+	err = collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&movie)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Println("Movie not found")
