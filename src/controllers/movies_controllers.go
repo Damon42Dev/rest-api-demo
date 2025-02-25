@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -14,7 +16,7 @@ import (
 
 type MoviesController interface {
 	GetMovies(*gin.Context)
-	// GetMovieByID(*gin.Context)
+	GetMovieByID(*gin.Context)
 }
 
 type moviesController struct {
@@ -28,12 +30,13 @@ func NewMoviesController(client *mongo.Client, service services.MoviesService, c
 }
 
 func (mc *moviesController) GetMovies(c *gin.Context) {
-	ctx, cancel := utils.CreateContextWithTimeout(c.Request.Context(), time.Duration(mc.config.App.Timeout))
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(mc.config.App.Timeout)*time.Second)
 	defer cancel()
 
-	pagination := utils.GetPaginationParams(c, 1, 10)
+	pageStr := c.Query("page")
+	sizeStr := c.Query("size")
 
-	movies, err := mc.moviesService.GetMovies(pagination.Page, pagination.Size, ctx)
+	movies, err := mc.moviesService.GetMovies(pageStr, sizeStr, ctx)
 	if err != nil {
 		log.Printf("Error getting movies: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve movies"})
@@ -43,20 +46,17 @@ func (mc *moviesController) GetMovies(c *gin.Context) {
 	c.JSON(http.StatusOK, movies)
 }
 
-// func (mc *moviesController) GetMovieByID(c *gin.Context) {
-// 	ctx, cancel := utils.CreateContextWithTimeout(c.Request.Context(), time.Duration(mc.config.App.Timeout))
-// 	defer cancel()
+func (mc *moviesController) GetMovieByID(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(mc.config.App.Timeout)*time.Second)
+	defer cancel()
 
-// 	objID, valid := utils.GetObjectIDFromParam(c, "id")
-// 	if !valid {
-// 		return
-// 	}
+	idStr := utils.GetIdStrFromParam(c, "id")
 
-// 	movie, err := mc.moviesService.GetMovieByID(objID.Hex(), ctx)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve movie by ID: %s", objID.Hex())})
-// 		return
-// 	}
+	movie, err := mc.moviesService.GetMovieByID(idStr, ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve movie by ID: %s", idStr)})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, movie)
-// }
+	c.JSON(http.StatusOK, movie)
+}

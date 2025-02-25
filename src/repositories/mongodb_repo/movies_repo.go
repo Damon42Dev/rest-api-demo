@@ -14,8 +14,8 @@ import (
 )
 
 type MoviesRepository interface {
-	GetMovies(page, size int, ctx context.Context) ([]*models.Movie, error)
-	GetMovieByID(objID primitive.ObjectID, ctx context.Context) (*models.Movie, error)
+	GetMovies(findOptions *options.FindOptions, ctx context.Context) ([]*models.Movie, error)
+	GetMovieByID(idStr string, ctx context.Context) (*models.Movie, error)
 }
 
 type moviesRepository struct {
@@ -27,11 +27,7 @@ func NewMovieMongodbRepo(config *utils.Configuration, client *mongo.Client) Movi
 	return &moviesRepository{config: config, client: client}
 }
 
-func (mcr moviesRepository) GetMovies(page, size int, ctx context.Context) ([]*models.Movie, error) {
-	findOptions := options.Find()
-	findOptions.SetLimit(int64(size))
-	findOptions.SetSkip(int64((page - 1) * size))
-
+func (mcr moviesRepository) GetMovies(findOptions *options.FindOptions, ctx context.Context) ([]*models.Movie, error) {
 	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[2])
 	cursor, err := collection.Find(ctx, bson.D{}, findOptions)
 	if err != nil {
@@ -52,11 +48,16 @@ func (mcr moviesRepository) GetMovies(page, size int, ctx context.Context) ([]*m
 	return movies, nil
 }
 
-func (mcr moviesRepository) GetMovieByID(objID primitive.ObjectID, ctx context.Context) (*models.Movie, error) {
+func (mcr moviesRepository) GetMovieByID(idStr string, ctx context.Context) (*models.Movie, error) {
+	objID, err := primitive.ObjectIDFromHex(idStr)
+	if err != nil {
+		return nil, err
+	}
+
 	var movie *models.Movie
 	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[2])
 
-	err := collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&movie)
+	err = collection.FindOne(ctx, bson.M{"_id": objID}).Decode(&movie)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			log.Println("Movie not found")

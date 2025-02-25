@@ -6,7 +6,7 @@ import (
 
 func RegisterRoutes(r *gin.Engine, controllers Controllers) {
 	r.GET("/movies", controllers.MoviesController.GetMovies)
-	// r.GET("/movies/:id", controllers.MoviesController.GetMovieByID)
+	r.GET("/movies/:id", controllers.MoviesController.GetMovieByID)
 
 	// r.GET("/comments", controllers.CommentsController.GetComments)
 	// r.GET("/comments/:id", controllers.CommentsController.GetCommentByID)
