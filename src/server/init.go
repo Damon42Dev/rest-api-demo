@@ -19,8 +19,9 @@ func Initialize(config utils.Configuration) {
 		log.Fatal(err)
 	}
 
-	// comments_repository := mongodb_repo.NewCommentMongodbRepo(&config, client)
-	// comments_controller := controllers.NewCommentsController(client, comments_repository, config)
+	commentsMongoRepository := mongodb_repo.NewCommentMongodbRepo(&config, client)
+	commentsService := services.NewCommentsService(commentsMongoRepository)
+	commentsController := controllers.NewCommentsController(client, commentsService, config)
 
 	moviesMongoRepository := mongodb_repo.NewMovieMongodbRepo(&config, client)
 	moviesService := services.NewMoviesService(moviesMongoRepository)
@@ -28,8 +29,8 @@ func Initialize(config utils.Configuration) {
 
 	// Create an instance of the Controllers struct
 	controllers := routes.Controllers{
-		// CommentsController: commentsController,
-		MoviesController: moviesController,
+		CommentsController: commentsController,
+		MoviesController:   moviesController,
 	}
 
 	// Creates a gin router with default middleware:
