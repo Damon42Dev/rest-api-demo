@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"example/rest-api-demo/src/models"
+	"example/rest-api-demo/src/repositories"
 	"example/rest-api-demo/src/utils"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,21 +14,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type CommentsRepository interface {
-	GetComments(findOptions *options.FindOptions, ctx context.Context) ([]*models.Comment, error)
-	GetCommentByID(id string, ctx context.Context) (*models.Comment, error)
-	DeleteCommentByID(id string, ctx context.Context) error
-	UpdateCommentByID(id string, updateData bson.M, ctx context.Context) error
-	CreateComment(comment models.Comment, ctx context.Context) (string, error)
-	GetCommentsForMovie(findOptions *options.FindOptions, idStr string, ctx context.Context) ([]*models.Comment, error)
-}
-
 type commentsRepository struct {
 	client *mongo.Client
 	config *utils.Configuration
 }
 
-func NewCommentMongodbRepo(config *utils.Configuration, client *mongo.Client) CommentsRepository {
+func NewCommentMongodbRepo(config *utils.Configuration, client *mongo.Client) repositories.CommentsRepository {
 	return &commentsRepository{config: config, client: client}
 }
 

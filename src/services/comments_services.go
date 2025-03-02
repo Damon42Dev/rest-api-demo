@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"example/rest-api-demo/src/models"
-	"example/rest-api-demo/src/repositories/mongodb_repo"
+	"example/rest-api-demo/src/repositories"
 	"example/rest-api-demo/src/utils"
 	"log"
 
@@ -21,10 +21,10 @@ type CommentsService interface {
 }
 
 type commentsService struct {
-	cr mongodb_repo.CommentsRepository
+	cr repositories.CommentsRepository
 }
 
-func NewCommentsService(cr mongodb_repo.CommentsRepository) CommentsService {
+func NewCommentsService(cr repositories.CommentsRepository) CommentsService {
 	return &commentsService{cr: cr}
 }
 

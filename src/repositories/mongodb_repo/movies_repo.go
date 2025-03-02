@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"example/rest-api-demo/src/models"
+	"example/rest-api-demo/src/repositories"
 	"example/rest-api-demo/src/utils"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,17 +14,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type MoviesRepository interface {
-	GetMovies(findOptions *options.FindOptions, ctx context.Context) ([]*models.Movie, error)
-	GetMovieByID(idStr string, ctx context.Context) (*models.Movie, error)
-}
-
 type moviesRepository struct {
 	client *mongo.Client
 	config *utils.Configuration
 }
 
-func NewMovieMongodbRepo(config *utils.Configuration, client *mongo.Client) MoviesRepository {
+func NewMovieMongodbRepo(config *utils.Configuration, client *mongo.Client) repositories.MoviesRepository {
 	return &moviesRepository{config: config, client: client}
 }
 
