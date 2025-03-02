@@ -7,6 +7,7 @@ import (
 	"example/rest-api-demo/src/utils"
 	"log"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -14,7 +15,7 @@ type CommentsService interface {
 	GetComments(pageStr, sizeStr string, ctx context.Context) ([]*models.Comment, error)
 	GetCommentByID(id string, ctx context.Context) (*models.Comment, error)
 	DeleteCommentByID(id string, ctx context.Context) error
-	// UpdateCommentByID(id string, ctx context.Context) (*models.Comment, error)
+	UpdateCommentByID(id string, updateData bson.M, ctx context.Context) error
 	// CreateComment(comment models.Comment, ctx context.Context) (primitive.ObjectID, error)
 }
 
@@ -44,4 +45,9 @@ func (cs *commentsService) GetCommentByID(idStr string, ctx context.Context) (*m
 func (cs *commentsService) DeleteCommentByID(idStr string, ctx context.Context) error {
 	log.Println("Deleting comment by ID", idStr)
 	return cs.cr.DeleteCommentByID(idStr, ctx)
+}
+
+func (cs *commentsService) UpdateCommentByID(idStr string, updateData bson.M, ctx context.Context) error {
+	log.Println("Updating comment by ID", idStr)
+	return cs.cr.UpdateCommentByID(idStr, updateData, ctx)
 }

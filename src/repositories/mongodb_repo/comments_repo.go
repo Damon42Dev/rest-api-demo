@@ -17,7 +17,7 @@ type CommentsRepository interface {
 	GetComments(findOptions *options.FindOptions, ctx context.Context) ([]*models.Comment, error)
 	GetCommentByID(id string, ctx context.Context) (*models.Comment, error)
 	DeleteCommentByID(id string, ctx context.Context) error
-	// UpdateCommentByID(objID primitive.ObjectID, updateData bson.M) error
+	UpdateCommentByID(id string, updateData bson.M, ctx context.Context) error
 	// CreateComment(comment models.Comment) (primitive.ObjectID, error)
 }
 
@@ -93,21 +93,26 @@ func (cr commentsRepository) DeleteCommentByID(idStr string, ctx context.Context
 	return nil
 }
 
-// func (mcr commentsRepository) UpdateCommentByID(objID primitive.ObjectID, updateData bson.M) error {
-// 	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[0])
+func (cr commentsRepository) UpdateCommentByID(idStr string, updateData bson.M, ctx context.Context) error {
+	objID, err := primitive.ObjectIDFromHex(idStr)
+	if err != nil {
+		return err
+	}
 
-// 	update := bson.M{"$set": updateData}
-// 	result, err := collection.UpdateOne(context.Background(), bson.M{"_id": objID}, update)
-// 	if err != nil {
-// 		return err
-// 	}
+	collection := cr.client.Database(cr.config.Database.DbName).Collection(cr.config.Database.Collections[0])
 
-// 	if result.MatchedCount == 0 {
-// 		return mongo.ErrNoDocuments
-// 	}
+	update := bson.M{"$set": updateData}
+	result, err := collection.UpdateOne(ctx, bson.M{"_id": objID}, update)
+	if err != nil {
+		return err
+	}
 
-// 	return nil
-// }
+	if result.MatchedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}
 
 // func (mcr commentsRepository) CreateComment(comment models.Comment) (primitive.ObjectID, error) {
 // 	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[0])
