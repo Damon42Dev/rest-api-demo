@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 	"example/rest-api-demo/src/models"
-	"example/rest-api-demo/src/repositories/mongodb_repo"
+	"example/rest-api-demo/src/repositories"
 	"example/rest-api-demo/src/utils"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,10 +15,10 @@ type MoviesService interface {
 }
 
 type moviesService struct {
-	mr mongodb_repo.MoviesRepository
+	mr repositories.MoviesRepository
 }
 
-func NewMoviesService(mr mongodb_repo.MoviesRepository) MoviesService {
+func NewMoviesService(mr repositories.MoviesRepository) MoviesService {
 	return &moviesService{mr: mr}
 }
 

@@ -6,6 +6,7 @@ import (
 
 // Controllers struct to hold all controllers
 type Controllers struct {
-	MoviesController controllers.MoviesController
+	MoviesController   controllers.MoviesController
+	CommentsController controllers.CommentsController
 	// Add other controllers here
 }

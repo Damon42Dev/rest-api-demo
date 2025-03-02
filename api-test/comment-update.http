@@ -3,5 +3,6 @@ Content-Type: application/json
 
 {
   "name": "Damon Test",
-  "text": "This is a test text sentence for update comment call"
+  "text": "This is a test text sentence for update comment call",
+  "email": "test@test.com"
 }
