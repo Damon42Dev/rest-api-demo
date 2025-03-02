@@ -1,7 +1,6 @@
 #How to run the project
 1. to use the actual credentials for .env file (!! Do NOT push it to remote repo)
 2. run "docker-compose up --build" in terminal
-3. need to drop the database before every re-build (Will improve later on)
 
 # Docker
 
