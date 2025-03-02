@@ -13,6 +13,9 @@ import (
 type CommentsService interface {
 	GetComments(pageStr, sizeStr string, ctx context.Context) ([]*models.Comment, error)
 	GetCommentByID(id string, ctx context.Context) (*models.Comment, error)
+	DeleteCommentByID(id string, ctx context.Context) error
+	// UpdateCommentByID(id string, ctx context.Context) (*models.Comment, error)
+	// CreateComment(comment models.Comment, ctx context.Context) (primitive.ObjectID, error)
 }
 
 type commentsService struct {
@@ -36,4 +39,9 @@ func (cs *commentsService) GetComments(pageStr, sizeStr string, ctx context.Cont
 func (cs *commentsService) GetCommentByID(idStr string, ctx context.Context) (*models.Comment, error) {
 	log.Println("Getting comment by ID", idStr)
 	return cs.cr.GetCommentByID(idStr, ctx)
+}
+
+func (cs *commentsService) DeleteCommentByID(idStr string, ctx context.Context) error {
+	log.Println("Deleting comment by ID", idStr)
+	return cs.cr.DeleteCommentByID(idStr, ctx)
 }

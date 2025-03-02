@@ -14,11 +14,11 @@ import (
 )
 
 type CommentsRepository interface {
-	// CreateComment(comment models.Comment) (primitive.ObjectID, error)
 	GetComments(findOptions *options.FindOptions, ctx context.Context) ([]*models.Comment, error)
 	GetCommentByID(id string, ctx context.Context) (*models.Comment, error)
-	// DeleteCommentByID(objID primitive.ObjectID) error
+	DeleteCommentByID(id string, ctx context.Context) error
 	// UpdateCommentByID(objID primitive.ObjectID, updateData bson.M) error
+	// CreateComment(comment models.Comment) (primitive.ObjectID, error)
 }
 
 type commentsRepository struct {
@@ -73,20 +73,25 @@ func (cr commentsRepository) GetCommentByID(idStr string, ctx context.Context) (
 	return comment, nil
 }
 
-// func (mcr commentsRepository) DeleteCommentByID(objID primitive.ObjectID) error {
-// 	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[0])
+func (cr commentsRepository) DeleteCommentByID(idStr string, ctx context.Context) error {
+	objID, err := primitive.ObjectIDFromHex(idStr)
+	if err != nil {
+		return err
+	}
 
-// 	result, err := collection.DeleteOne(context.Background(), bson.M{"_id": objID})
-// 	if err != nil {
-// 		return err
-// 	}
+	collection := cr.client.Database(cr.config.Database.DbName).Collection(cr.config.Database.Collections[0])
 
-// 	if result.DeletedCount == 0 {
-// 		return mongo.ErrNoDocuments
-// 	}
+	result, err := collection.DeleteOne(ctx, bson.M{"_id": objID})
+	if err != nil {
+		return err
+	}
 
-// 	return nil
-// }
+	if result.DeletedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
+}
 
 // func (mcr commentsRepository) UpdateCommentByID(objID primitive.ObjectID, updateData bson.M) error {
 // 	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[0])

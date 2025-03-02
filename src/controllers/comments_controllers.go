@@ -17,9 +17,9 @@ import (
 type CommentsController interface {
 	GetComments(*gin.Context)
 	GetCommentByID(*gin.Context)
-	// CreateComment(*gin.Context)
-	// DeleteCommentByID(*gin.Context)
+	DeleteCommentByID(*gin.Context)
 	// UpdateCommentByID(*gin.Context)
+	// CreateComment(*gin.Context)
 }
 
 type commentsController struct {
@@ -66,20 +66,20 @@ func (cc *commentsController) GetCommentByID(c *gin.Context) {
 	c.JSON(http.StatusOK, comment)
 }
 
-// func (cc *commentsController) DeleteCommentByID(c *gin.Context) {
-// 	objID, valid := utils.GetObjectIDFromParam(c, "id")
-// 	if !valid {
-// 		return
-// 	}
+func (cc *commentsController) DeleteCommentByID(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(cc.config.App.Timeout)*time.Second)
+	defer cancel()
 
-// 	err := cc.commentsRepository.DeleteCommentByID(objID)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error deleting document: %s", err)})
-// 		return
-// 	}
+	idStr := utils.GetIdStrFromParam(c, "id")
 
-// 	c.JSON(http.StatusOK, gin.H{"message": "Comment deleted successfully"})
-// }
+	err := cc.commentsService.DeleteCommentByID(idStr, ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error deleting comment by ID: %s", idStr)})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Comment deleted successfully"})
+}
 
 // func (cc *commentsController) UpdateCommentByID(c *gin.Context) {
 // 	objID, valid := utils.GetObjectIDFromParam(c, "id")
