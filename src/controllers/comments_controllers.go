@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"example/rest-api-demo/src/models"
 	"example/rest-api-demo/src/services"
 	"example/rest-api-demo/src/utils"
 
@@ -19,7 +20,7 @@ type CommentsController interface {
 	GetCommentByID(*gin.Context)
 	DeleteCommentByID(*gin.Context)
 	UpdateCommentByID(*gin.Context)
-	// CreateComment(*gin.Context)
+	CreateComment(*gin.Context)
 }
 
 type commentsController struct {
@@ -102,21 +103,24 @@ func (cc *commentsController) UpdateCommentByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Comment updated successfully"})
 }
 
-// func (cc *commentsController) CreateComment(c *gin.Context) {
-// 	var comment models.Comment
-// 	if err := c.BindJSON(&comment); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
-// 		return
-// 	}
+func (cc *commentsController) CreateComment(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(cc.config.App.Timeout)*time.Second)
+	defer cancel()
 
-// 	id, err := cc.commentsRepository.CreateComment(comment)
+	var comment models.Comment
+	if err := c.BindJSON(&comment); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
 
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError,
-// 			gin.H{"error": fmt.Sprintf("Error inserting document: %s", err)})
-// 		return
-// 	}
+	id, err := cc.commentsService.CreateComment(comment, ctx)
 
-// 	c.JSON(http.StatusCreated, gin.H{"message": "Comment created successfully",
-// 		"id": id.Hex()})
-// }
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,
+			gin.H{"error": fmt.Sprintf("Error inserting document: %s", err)})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "Comment created successfully",
+		"id": id})
+}

@@ -16,7 +16,7 @@ type CommentsService interface {
 	GetCommentByID(id string, ctx context.Context) (*models.Comment, error)
 	DeleteCommentByID(id string, ctx context.Context) error
 	UpdateCommentByID(id string, updateData bson.M, ctx context.Context) error
-	// CreateComment(comment models.Comment, ctx context.Context) (primitive.ObjectID, error)
+	CreateComment(comment models.Comment, ctx context.Context) (string, error)
 }
 
 type commentsService struct {
@@ -50,4 +50,9 @@ func (cs *commentsService) DeleteCommentByID(idStr string, ctx context.Context) 
 func (cs *commentsService) UpdateCommentByID(idStr string, updateData bson.M, ctx context.Context) error {
 	log.Println("Updating comment by ID", idStr)
 	return cs.cr.UpdateCommentByID(idStr, updateData, ctx)
+}
+
+func (cs *commentsService) CreateComment(comment models.Comment, ctx context.Context) (string, error) {
+	log.Println("Creating comment")
+	return cs.cr.CreateComment(comment, ctx)
 }

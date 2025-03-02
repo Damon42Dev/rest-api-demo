@@ -18,7 +18,7 @@ type CommentsRepository interface {
 	GetCommentByID(id string, ctx context.Context) (*models.Comment, error)
 	DeleteCommentByID(id string, ctx context.Context) error
 	UpdateCommentByID(id string, updateData bson.M, ctx context.Context) error
-	// CreateComment(comment models.Comment) (primitive.ObjectID, error)
+	CreateComment(comment models.Comment, ctx context.Context) (string, error)
 }
 
 type commentsRepository struct {
@@ -114,13 +114,13 @@ func (cr commentsRepository) UpdateCommentByID(idStr string, updateData bson.M, 
 	return nil
 }
 
-// func (mcr commentsRepository) CreateComment(comment models.Comment) (primitive.ObjectID, error) {
-// 	collection := mcr.client.Database(mcr.config.Database.DbName).Collection(mcr.config.Database.Collections[0])
+func (cr commentsRepository) CreateComment(comment models.Comment, ctx context.Context) (string, error) {
+	collection := cr.client.Database(cr.config.Database.DbName).Collection(cr.config.Database.Collections[0])
 
-// 	result, err := collection.InsertOne(context.Background(), comment)
-// 	if err != nil {
-// 		return primitive.NilObjectID, err
-// 	}
+	result, err := collection.InsertOne(ctx, comment)
+	if err != nil {
+		return "", err
+	}
 
-// 	return result.InsertedID.(primitive.ObjectID), nil
-// }
+	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+}
