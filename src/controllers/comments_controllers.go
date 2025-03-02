@@ -21,6 +21,7 @@ type CommentsController interface {
 	DeleteCommentByID(*gin.Context)
 	UpdateCommentByID(*gin.Context)
 	CreateComment(*gin.Context)
+	GetCommentsForMovie(*gin.Context)
 }
 
 type commentsController struct {
@@ -123,4 +124,23 @@ func (cc *commentsController) CreateComment(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Comment created successfully",
 		"id": id})
+}
+
+func (cc *commentsController) GetCommentsForMovie(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), time.Duration(cc.config.App.Timeout)*time.Second)
+	defer cancel()
+
+	idStr := utils.GetIdStrFromParam(c, "id")
+
+	log.Println("Getting comments for movie with ID:", idStr)
+	pageStr := c.Query("page")
+	sizeStr := c.Query("size")
+
+	comments, err := cc.commentsService.GetCommentsForMovie(pageStr, sizeStr, idStr, ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Error getting comments for movie: %s", idStr)})
+		return
+	}
+
+	c.JSON(http.StatusOK, comments)
 }

@@ -17,6 +17,7 @@ type CommentsService interface {
 	DeleteCommentByID(id string, ctx context.Context) error
 	UpdateCommentByID(id string, updateData bson.M, ctx context.Context) error
 	CreateComment(comment models.Comment, ctx context.Context) (string, error)
+	GetCommentsForMovie(pageStr, sizeStr string, idStr string, ctx context.Context) ([]*models.Comment, error)
 }
 
 type commentsService struct {
@@ -55,4 +56,15 @@ func (cs *commentsService) UpdateCommentByID(idStr string, updateData bson.M, ct
 func (cs *commentsService) CreateComment(comment models.Comment, ctx context.Context) (string, error) {
 	log.Println("Creating comment")
 	return cs.cr.CreateComment(comment, ctx)
+}
+
+func (cs *commentsService) GetCommentsForMovie(pageStr, sizeStr string, idStr string, ctx context.Context) ([]*models.Comment, error) {
+	log.Println("Getting comments for movie by ID", idStr)
+	pagination := utils.GetPaginationParams(pageStr, sizeStr)
+
+	findOptions := options.Find()
+	findOptions.SetLimit(int64(pagination.Size))
+	findOptions.SetSkip(int64((pagination.Page - 1) * pagination.Size))
+
+	return cs.cr.GetCommentsForMovie(findOptions, idStr, ctx)
 }

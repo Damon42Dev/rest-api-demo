@@ -13,4 +13,5 @@ func RegisterRoutes(r *gin.Engine, controllers Controllers) {
 	r.DELETE("/comments/:id", controllers.CommentsController.DeleteCommentByID)
 	r.PUT("/comments/:id", controllers.CommentsController.UpdateCommentByID)
 	r.POST("/comments", controllers.CommentsController.CreateComment)
+	r.GET("/movies/:id/comments", controllers.CommentsController.GetCommentsForMovie)
 }

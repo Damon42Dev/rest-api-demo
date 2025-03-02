@@ -19,6 +19,7 @@ type CommentsRepository interface {
 	DeleteCommentByID(id string, ctx context.Context) error
 	UpdateCommentByID(id string, updateData bson.M, ctx context.Context) error
 	CreateComment(comment models.Comment, ctx context.Context) (string, error)
+	GetCommentsForMovie(findOptions *options.FindOptions, idStr string, ctx context.Context) ([]*models.Comment, error)
 }
 
 type commentsRepository struct {
@@ -123,4 +124,32 @@ func (cr commentsRepository) CreateComment(comment models.Comment, ctx context.C
 	}
 
 	return result.InsertedID.(primitive.ObjectID).Hex(), nil
+}
+
+func (cr commentsRepository) GetCommentsForMovie(findOptions *options.FindOptions, idStr string, ctx context.Context) ([]*models.Comment, error) {
+	objID, err := primitive.ObjectIDFromHex(idStr)
+	if err != nil {
+		return nil, err
+	}
+
+	collection := cr.client.Database(cr.config.Database.DbName).Collection(cr.config.Database.Collections[0])
+	cursor, err := collection.Find(ctx, bson.M{"movie_id": objID}, findOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	var comments []*models.Comment
+
+	for cursor.Next(ctx) {
+		var comment models.Comment
+		if err := cursor.Decode(&comment); err != nil {
+			log.Println("Error decoding comment:", err)
+			return nil, err
+		}
+
+		log.Println("Comment:", &comment)
+		comments = append(comments, &comment)
+	}
+
+	return comments, nil
 }
