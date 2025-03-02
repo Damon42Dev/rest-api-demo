@@ -22,7 +22,7 @@ comment of movies needs to be connected to Movie. Passing the movie id in the ro
 
 movies/:id/comments -> it shows all the comments of a specific move(id)
 
-movies/:movie_id/comments/:comment_id
+movies/:movie_id/comments/:comment_id -> This can be filtered on FE
 
 2. Inetrface
 
