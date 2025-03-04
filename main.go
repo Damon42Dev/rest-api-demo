@@ -15,9 +15,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var config utils.Configuration
+var client *mongo.Client
 
 func init() {
 	err := godotenv.Load()
@@ -26,6 +28,11 @@ func init() {
 	}
 
 	config = readConfiguration()
+	client, err = mongodb.ConnectMongoDb(config.Database.Uri)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func main() {
@@ -57,11 +64,6 @@ func readConfiguration() utils.Configuration {
 }
 
 func initialize(config utils.Configuration) {
-	client, err := mongodb.ConnectMongoDb(config.Database.Uri)
-
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	commentsMongoRepository := mongodb_repo.NewCommentMongodbRepo(&config, client)
 	commentsService := services.NewCommentsService(commentsMongoRepository)
