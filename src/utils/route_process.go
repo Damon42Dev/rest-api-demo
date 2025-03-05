@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
+	"net/http/httptest"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -49,4 +52,25 @@ func GetObjectIDFromParam(c *gin.Context, param string) (primitive.ObjectID, boo
 func GetIdStrFromParam(c *gin.Context, param string) string {
 	id := c.Param(param)
 	return id
+}
+
+// func PerformRequest(router *gin.Engine, method, path string) *httptest.ResponseRecorder {
+// 	req, _ := http.NewRequest(method, path, nil)
+// 	resp := httptest.NewRecorder()
+// 	router.ServeHTTP(resp, req)
+// 	return resp
+// }
+
+func PerformRequest(router *gin.Engine, method, path string, body interface{}) *httptest.ResponseRecorder {
+	var req *http.Request
+	if body != nil {
+		jsonBody, _ := json.Marshal(body)
+		req, _ = http.NewRequest(method, path, bytes.NewBuffer(jsonBody))
+		req.Header.Set("Content-Type", "application/json")
+	} else {
+		req, _ = http.NewRequest(method, path, nil)
+	}
+	resp := httptest.NewRecorder()
+	router.ServeHTTP(resp, req)
+	return resp
 }

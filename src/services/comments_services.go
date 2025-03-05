@@ -16,7 +16,7 @@ type CommentsService interface {
 	GetCommentByID(id string, ctx context.Context) (*models.Comment, error)
 	DeleteCommentByID(id string, ctx context.Context) error
 	UpdateCommentByID(id string, updateData bson.M, ctx context.Context) error
-	CreateComment(comment models.Comment, ctx context.Context) (string, error)
+	CreateComment(comment *models.Comment, ctx context.Context) (string, error)
 	GetCommentsForMovie(pageStr, sizeStr string, idStr string, ctx context.Context) ([]*models.Comment, error)
 }
 
@@ -53,7 +53,7 @@ func (cs *commentsService) UpdateCommentByID(idStr string, updateData bson.M, ct
 	return cs.cr.UpdateCommentByID(idStr, updateData, ctx)
 }
 
-func (cs *commentsService) CreateComment(comment models.Comment, ctx context.Context) (string, error) {
+func (cs *commentsService) CreateComment(comment *models.Comment, ctx context.Context) (string, error) {
 	log.Println("Creating comment")
 	return cs.cr.CreateComment(comment, ctx)
 }
