@@ -13,7 +13,7 @@ type CommentsRepository interface {
 	GetCommentByID(id string, ctx context.Context) (*models.Comment, error)
 	DeleteCommentByID(id string, ctx context.Context) error
 	UpdateCommentByID(id string, updateData bson.M, ctx context.Context) error
-	CreateComment(comment models.Comment, ctx context.Context) (string, error)
+	CreateComment(comment *models.Comment, ctx context.Context) (string, error)
 	GetCommentsForMovie(findOptions *options.FindOptions, idStr string, ctx context.Context) ([]*models.Comment, error)
 }
 

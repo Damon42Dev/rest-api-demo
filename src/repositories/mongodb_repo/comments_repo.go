@@ -107,7 +107,7 @@ func (cr commentsRepository) UpdateCommentByID(idStr string, updateData bson.M, 
 	return nil
 }
 
-func (cr commentsRepository) CreateComment(comment models.Comment, ctx context.Context) (string, error) {
+func (cr commentsRepository) CreateComment(comment *models.Comment, ctx context.Context) (string, error) {
 	collection := cr.client.Database(cr.config.Database.DbName).Collection(cr.config.Database.Collections[0])
 
 	result, err := collection.InsertOne(ctx, comment)

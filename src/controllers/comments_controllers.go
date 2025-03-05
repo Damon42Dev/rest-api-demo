@@ -116,7 +116,7 @@ func (cc *commentsController) CreateComment(c *gin.Context) {
 		return
 	}
 
-	id, err := cc.commentsService.CreateComment(comment, ctx)
+	id, err := cc.commentsService.CreateComment(&comment, ctx)
 
 	if err != nil {
 		log.Printf("Error creating comment: %v", err)

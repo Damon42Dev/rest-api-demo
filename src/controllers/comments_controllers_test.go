@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // MockCommentsService is a mock implementation of the CommentsService interface
@@ -40,7 +41,7 @@ func (m *MockCommentsService) UpdateCommentByID(id string, updateData bson.M, ct
 	return args.Error(0)
 }
 
-func (m *MockCommentsService) CreateComment(comment models.Comment, ctx context.Context) (string, error) {
+func (m *MockCommentsService) CreateComment(comment *models.Comment, ctx context.Context) (string, error) {
 	args := m.Called(comment, ctx)
 	return args.String(0), args.Error(1)
 }
@@ -144,25 +145,25 @@ func TestUpdateCommentByID(t *testing.T) {
 	assert.Equal(t, "Comment updated successfully", response["message"])
 }
 
-// func TestCreateComment(t *testing.T) {
-// 	mockService, router := setupCommentsControllerTest()
+func TestCreateComment(t *testing.T) {
+	mockService, router := setupCommentsControllerTest()
 
-// 	comment := GetCommentByIDTestCase()
-// 	commentID := primitive.NewObjectID()
+	comment := GetCommentByIDTestCase()
+	commentID := primitive.NewObjectID()
 
-// 	mockService.On("CreateComment", comment, mock.Anything).Return(commentID.Hex(), nil)
+	mockService.On("CreateComment", mock.AnythingOfType("*models.Comment"), mock.Anything).Return(commentID.Hex(), nil)
 
-// 	resp := utils.PerformRequest(router, "POST", "/comments", comment)
+	resp := utils.PerformRequest(router, "POST", "/comments", &comment)
 
-// 	assert.Equal(t, http.StatusCreated, resp.Code)
-// 	var response map[string]interface{}
-// 	err := json.Unmarshal(resp.Body.Bytes(), &response)
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, "Comment created successfully", response["message"])
-// 	idStr, ok := response["id"].(string)
-// 	assert.True(t, ok)
-// 	assert.Equal(t, commentID.Hex(), idStr)
-// }
+	assert.Equal(t, http.StatusCreated, resp.Code)
+	var response map[string]interface{}
+	err := json.Unmarshal(resp.Body.Bytes(), &response)
+	assert.NoError(t, err)
+	assert.Equal(t, "Comment created successfully", response["message"])
+	idStr, ok := response["id"].(string)
+	assert.True(t, ok)
+	assert.Equal(t, commentID.Hex(), idStr)
+}
 
 func TestGetCommentsForMovie(t *testing.T) {
 	mockService, router := setupCommentsControllerTest()
