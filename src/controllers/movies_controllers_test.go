@@ -56,7 +56,7 @@ func TestGetMovies(t *testing.T) {
 
 	mockService.On("GetMovies", pageStr, sizeStr, mock.Anything).Return(movies, nil)
 
-	resp := utils.PerformRequest(router, "GET", "/movies?page=1&size=5")
+	resp := utils.PerformRequest(router, "GET", "/movies?page=1&size=5", nil)
 
 	assert.Equal(t, http.StatusOK, resp.Code)
 	var response []*models.Movie
@@ -77,7 +77,7 @@ func TestGetMovieByID(t *testing.T) {
 
 	mockService.On("GetMovieByID", movieID, mock.Anything).Return(movie, nil)
 
-	resp := utils.PerformRequest(router, "GET", "/movies/"+movieID)
+	resp := utils.PerformRequest(router, "GET", "/movies/"+movieID, nil)
 
 	assert.Equal(t, http.StatusOK, resp.Code)
 	var response models.Movie

@@ -110,6 +110,8 @@ func (cc *commentsController) CreateComment(c *gin.Context) {
 
 	var comment models.Comment
 	if err := c.BindJSON(&comment); err != nil {
+		log.Printf("Error binding JSON: %v", err)
+
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
 		return
 	}
@@ -117,6 +119,8 @@ func (cc *commentsController) CreateComment(c *gin.Context) {
 	id, err := cc.commentsService.CreateComment(comment, ctx)
 
 	if err != nil {
+		log.Printf("Error creating comment: %v", err)
+
 		c.JSON(http.StatusInternalServerError,
 			gin.H{"error": fmt.Sprintf("Error inserting document: %s", err)})
 		return
