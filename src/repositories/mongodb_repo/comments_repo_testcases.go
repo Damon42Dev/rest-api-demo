@@ -1,4 +1,4 @@
-package controllers
+package mongodb_repo
 
 import (
 	"example/rest-api-demo/src/models"
