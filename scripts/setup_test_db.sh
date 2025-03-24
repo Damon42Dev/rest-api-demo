@@ -100,16 +100,24 @@ db.movies.insertMany([
   {
     _id: ObjectId('60c72b2f9b1e8a5d6c8b4567'),
     title: 'Test Movie 1',
-    description: 'This is a test movie 1',
-    director: 'Test Director 1',
-    releaseDate: new Date()
+    plot: 'This is a test movie 1',
+    directors: ['Test Director 1'],
+    released: new Date(),
+    year: 2024,
+    rated: 'PG-13',
+    runtime: 120,
+    type: 'movie'
   },
   {
     _id: ObjectId('60c72b2f9b1e8a5d6c8b4568'),
     title: 'Test Movie 2',
-    description: 'This is a test movie 2',
-    director: 'Test Director 2',
-    releaseDate: new Date()
+    plot: 'This is a test movie 2',
+    directors: ['Test Director 2'],
+    released: new Date(),
+    year: 2024,
+    rated: 'PG-13',
+    runtime: 120,
+    type: 'movie'
   }
 ])
 db.comments.insertMany([

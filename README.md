@@ -34,3 +34,5 @@ go test -v
 go test -v -run TestCommentsRoutes
 ### Run a specific test case within TestCommentsRoutes
 go test -v -run TestCommentsRoutes/POST_\//comments
+
+go test -v -run "TestMockMoviesRoutes/GET_/movies/:id"
