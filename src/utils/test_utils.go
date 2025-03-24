@@ -1,12 +1,12 @@
-package mongodb_repo
+package utils
 
 import (
 	"context"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"testing"
 	"time"
-
-	"example/rest-api-demo/src/utils"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,7 +15,7 @@ import (
 // TestDBClient holds the MongoDB client and repositories for testing
 type TestDBClient struct {
 	Client *mongo.Client
-	Config *utils.Configuration
+	Config *Configuration
 }
 
 // waitForMongoDB attempts to connect to MongoDB with retries
@@ -44,8 +44,15 @@ func SetupTestDB(t *testing.T) *TestDBClient {
 	t.Helper()
 	ctx := context.Background()
 
+	// Get the workspace root directory
+	workspaceRoot, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("Failed to get working directory: %v", err)
+	}
+
 	// Run the setup script
-	cmd := exec.Command("bash", "../../../scripts/setup_test_db.sh")
+	setupScript := filepath.Join(workspaceRoot, "scripts", "setup_test_db.sh")
+	cmd := exec.Command("bash", setupScript)
 	if err := cmd.Run(); err != nil {
 		t.Fatalf("Failed to run setup script: %v", err)
 	}
@@ -60,8 +67,8 @@ func SetupTestDB(t *testing.T) *TestDBClient {
 	}
 
 	// Create a test configuration
-	config := &utils.Configuration{
-		Database: utils.DatabaseSetting{
+	config := &Configuration{
+		Database: DatabaseSetting{
 			DbName:      "test_db",
 			Collections: []string{"comments", "users", "movies"},
 		},
@@ -84,7 +91,15 @@ func TeardownTestDB(t *testing.T, client *mongo.Client) {
 		}
 	}
 
-	cmd := exec.Command("bash", "../../../scripts/teardown_test_db.sh")
+	// Get the workspace root directory
+	workspaceRoot, err := os.Getwd()
+	if err != nil {
+		t.Errorf("Failed to get working directory: %v", err)
+	}
+
+	// Run the teardown script
+	teardownScript := filepath.Join(workspaceRoot, "scripts", "teardown_test_db.sh")
+	cmd := exec.Command("bash", teardownScript)
 	if err := cmd.Run(); err != nil {
 		t.Errorf("Failed to run teardown script: %v", err)
 	}

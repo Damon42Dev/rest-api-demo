@@ -28,9 +28,9 @@ ifconfig | grep inet
 
 
 ## Run Test cases
-### Goto controller folder
-cd /Users/damonwang/go/src/example/rest-api-demo/src/controllers
 ### Run all test cases
 go test -v
 ### Run all a specific test case
-go test -v -run TEST_FUNCTION_NAME
+go test -v -run TestCommentsRoutes
+### Run a specific test case within TestCommentsRoutes
+go test -v -run TestCommentsRoutes/POST_\//comments
