@@ -61,7 +61,7 @@ func (cc *commentsController) GetCommentByID(c *gin.Context) {
 
 	comment, err := cc.commentsService.GetCommentByID(idStr, ctx)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to retrieve comment by ID: %s", idStr)})
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf("Failed to retrieve comment by ID: %s", idStr)})
 		return
 	}
 
